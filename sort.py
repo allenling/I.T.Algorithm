@@ -54,6 +54,45 @@ def shell_insert_sort(data):
         vector = vector / 2
 
 
+def merge(data1, data2):
+    tmp = []
+    p1 = p2 = 0
+    size1 = len(data1)
+    size2 = len(data2)
+    while p1 < size1 and p2 < size2:
+        if data1[p1] <= data2[p2]:
+            tmp.append(data1[p1])
+            p1 += 1
+            continue
+        tmp.append(data2[p2])
+        p2 += 1
+    if p1 == size1:
+        tmp.extend(data2[p2:])
+    else:
+        tmp.extend(data1[p1:])
+    return tmp
+
+
+def merge_sort(data):
+    '''
+    归并排序
+    分治策略, 复杂度都是O(nlog2(n)), 空间是O(n), 稳定
+    一般递归实现
+    个人不喜欢递归, 所以尽量非递归
+    '''
+    while True:
+        first = data.pop(0)
+        second = data.pop(0)
+        first = [first] if not isinstance(first, list) else first
+        second = [second] if not isinstance(second, list) else second
+        tmp = merge(first, second)
+        if not data:
+            data = tmp
+            break
+        data.append(tmp)
+    return data
+
+
 def adjust_heap(root, data, size):
     while root < size:
         child = root * 2 + 1
@@ -90,6 +129,55 @@ def heap_sort(data):
         adjust_heap(0, data, size)
         size -= 1
 
+def binary_search(data, value):
+    '''
+    二分搜索
+    二分搜索和二叉搜索树很类似, 只是二叉查找树不要求有序, 只要求左节点比其父节点小, 右节点比父节点大就好了
+    '''
+    if value > data[-1] or data[0] > value:
+        return -1
+    size = len(data)
+    if value == data[-1]:
+        return size - 1
+    if value == data[0]:
+        return 0
+    start, end = 0, size
+    while start < end:
+        middle = ((end - start) / 2) + start
+        if value < data[middle]:
+            end = middle
+        elif value > data[middle]:
+            start = middle
+        else:
+            return middle
+    return -1
+
+
+def adjust_middle(data, start, end):
+    point_index, point = start, data[start]
+    while start < end:
+        while data[end] >= point and start < end:
+            end -= 1
+        data[end], data[point_index] = data[point_index], data[end]
+        point_index = end
+        while data[start] <= point and start < end:
+            start += 1
+        data[start], data[point_index] = data[point_index], data[start]
+        point_index = start
+    return start
+
+
+def quick_sort(data, start, end):
+    '''
+    快排
+    分治策略
+    最坏O(n**2), 最好和平均都是O(nlog2(n)), 空间O(nlog2(n)), 不稳定
+    没想出非递归方案
+    '''
+    if start < end:
+        middle = adjust_middle(data, start, end)
+        quick_sort(data, start, middle - 1)
+        quick_sort(data, middle + 1, end)
 
 def main():
     data = [5, 8, 3, 2, 1]
