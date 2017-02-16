@@ -23,7 +23,7 @@ def find_max_cross_subarray(data, start, mid, end):
             right_max_sum = tmp_sum
             max_end = right_index
         right_index += 1
-    return right_max_sum + left_max_sum, max_start, max_end
+    return max_start, max_end, right_max_sum + left_max_sum
 
 
 def recursion_for_max_sum_of_subarray(data, start, end):
@@ -33,14 +33,14 @@ def recursion_for_max_sum_of_subarray(data, start, end):
     if start == end:
         return data[start], start, end
     mid = start + ((end - start) / 2)
-    left_max, left_start, left_end = recursion_for_max_sum_of_subarray(data, start, mid)
-    right_max, right_start, right_end = recursion_for_max_sum_of_subarray(data, mid + 1, end)
-    cross_max, cross_start, cross_end = find_max_cross_subarray(data, start, mid, end)
+    left_start, left_end, left_max = recursion_for_max_sum_of_subarray(data, start, mid)
+    right_start, right_end, right_max = recursion_for_max_sum_of_subarray(data, mid + 1, end)
+    cross_start, cross_end, cross_max = find_max_cross_subarray(data, start, mid, end)
     if left_max > right_max and left_max > cross_max:
-        return left_max, left_start, left_end
+        return left_start, left_end, left_max
     if right_max > left_max and right_max > cross_max:
-        return right_max, right_start, right_end
-    return cross_max, cross_start, cross_end
+        return right_start, right_end, right_max
+    return cross_start, cross_end, cross_max
 
 
 def max_sum_of_subarray(data):
@@ -51,39 +51,57 @@ def max_sum_of_subarray(data):
     最坏情形是: 都是正数， 则每一次都要计算data[p:j+1]的和，所以最坏情形下有2+3+4+5+...+n=(n+2)*(n/2)=O(n^2)
     最好的情形是第一个元素之后都是负数， 这样每一次我们都不需要计算data[p:j+1], 直接下一步就可以了，所以是O(n)
     但是，我们可以通过一个O(1)的比较方法求出data[i:j]和data[j+1]中的最大子数组, 所以就是O(1)0(n)=O(n)
+    https://3meng.github.io/2016/02/08/Algorithm-of-Finding-Maximum-SubArray/
     '''
-    max_sum, start, end = data[0], 0, 0
-    end_point = 1
+    start = end = 0
+    current_sum = max_sum = data[0]
     size = len(data)
-    tmp_sum = max_sum
-    pindex, pvalue = -1, 0
-    while end_point < size:
-        tmp_sum += data[end_point]
-        if pindex > -1:
-            pvalue += data[end_point]
-        if data[end_point] < 0:
-            end_point += 1
+    i = 1
+    first_p_index = None
+    while i < size:
+        current_sum += data[i]
+        if data[i] < 0:
+            i += 1
             continue
-        after_value = pvalue if pindex > -1 else data[end_point]
-        if after_value > tmp_sum and after_value > max_sum:
-            max_sum, start, end = after_value, pindex if pindex > -1 else end_point, end_point
-            tmp_sum = after_value
-            pindex, pvalue = -1, 0
-        elif tmp_sum > after_value and tmp_sum > max_sum:
-            pindex, pvalue = -1, 0
-            max_sum, end = tmp_sum, end_point
+        if first_p_index:
+            if current_sum > max_sum and current_sum > data[i]:
+                end = i
+                max_sum = current_sum
+            elif data[i] > current_sum and data[i] > max_sum:
+                start = end = i
+                max_sum = data[i]
+            pvalue = sum(data[first_p_index: i + 1])
+            if pvalue > max_sum:
+                max_sum = pvalue
+                current_sum = max_sum
+                start, end = first_p_index, i
+                first_p_index = None
         else:
-            if pindex == -1:
-                pindex = end_point
-                pvalue = data[end_point]
-        end_point += 1
-    return max_sum, start, end
+            if current_sum > max_sum and current_sum > data[i]:
+                end = i
+                max_sum = current_sum
+            elif data[i] > current_sum and data[i] > max_sum:
+                start = end = i
+                current_sum = max_sum = data[i]
+            else:
+                first_p_index = i
+        i += 1
+    return start, end, max_sum
 
 
 def main():
-    data = [13, -3, -25, 20, -3, -16, -23, 18, 20, -7, 12, -5, -22, 15, -4, 7]
-    print recursion_for_max_sum_of_subarray(data, 0, len(data) - 1)
-    print max_sum_of_subarray(data)
+    dataset = [[13, -3, -25, 20, -3, -16, -23, 18, 20, -7, 12, -5, -22, 15, -4, 7],
+               [18, 20],
+               [-2, -2, -3],
+               [18, 20, -1],
+               [18, 20, -77, 5, 40],
+               [10, -11, 12]
+               ]
+    for data in dataset:
+        print data, max_sum_of_subarray(data)
+    print '------------'
+    for data in dataset:
+        print data, recursion_for_max_sum_of_subarray(data, 0, len(data) - 1)
 
 
 if __name__ == '__main__':

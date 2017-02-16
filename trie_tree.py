@@ -1,6 +1,7 @@
 # coding=utf-8
 '''
 字典树
+http://www.cnblogs.com/huangxincheng/archive/2012/11/25/2788268.html
 '''
 from sort import heap_sort
 

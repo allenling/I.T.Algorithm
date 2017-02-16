@@ -1,4 +1,8 @@
 # coding=utf-8
+'''
+关于python的内置hash:http://www.asmeurer.com/blog/posts/what-happens-when-you-mess-with-hashing-in-python/
+扩容之后的重新把旧数据插入到新的表中的速度是O(1)吗?
+'''
 
 ACTIVE = 0
 DUMMY = 1

@@ -129,6 +129,7 @@ def heap_sort(data):
         adjust_heap(0, data, size)
         size -= 1
 
+
 def binary_search(data, value):
     '''
     二分搜索
@@ -145,9 +146,9 @@ def binary_search(data, value):
     while start < end:
         middle = ((end - start) / 2) + start
         if value < data[middle]:
-            end = middle
+            end = middle - 1
         elif value > data[middle]:
-            start = middle
+            start = middle + 1
         else:
             return middle
     return -1
@@ -179,6 +180,7 @@ def quick_sort(data, start, end):
         quick_sort(data, start, middle - 1)
         quick_sort(data, middle + 1, end)
 
+
 def main():
     data = [5, 8, 3, 2, 1]
     insert_sort(data)
@@ -191,6 +193,7 @@ def main():
     data = [3, 1, 5, 7, 2, 4, 9, 6, 10, 8]
     heap_sort(data)
     print data
+    print binary_search([1, 5], 3)
 
 if __name__ == '__main__':
     main()
