@@ -73,15 +73,35 @@ a 0 0 2 0
 '''
 
 
-def lcs(a, b):
-    s1, s2 = len(a), len(b)
-    tmp = [[0] * (s2 + 1) for i in range(s1 + 1)]
+def lcs(first, second):
+    first_len = len(first)
+    second_len = len(second)
+    # 矩阵是sec为列, first为行
+    matrix = [[0] * (second_len + 1) for _ in range(first_len + 1)]
+    max_len = 0
+    max_chars = []
+    # 这里是每行每一个去比对
+    for i in range(first_len):
+        for j in range(second_len):
+            if first[i] == second[j]:
+                current_max = matrix[i][j] + 1
+                if current_max > max_len:
+                    max_len = current_max
+                    max_chars.append(first[i])
+            else:
+                current_max = max(matrix[i + 1][j], matrix[i][j + 1])
+            matrix[i + 1][j + 1] = current_max
+    print max_chars, max_len
+    for i in matrix:
+        print i
 
 
 def main():
     data1 = ['G', 'C', 'T', 'A']
     data2 = ['G', 'B', 'T', 'A']
-    print lcs[data1, data2]
+    lcs(data1, data2)
+    print '-----------'
+    lcs(['G', 'C', 'T', 'A'], ['G', 'B', 'T', 'T'])
 
 if __name__ == '__main__':
     main()
