@@ -11,3 +11,48 @@ https://www.cnblogs.com/dolphin0520/p/3749259.html
 
 另外还有一种实现思路就是利用 小顶堆+hashmap，小顶堆插入、删除操作都能达到O(logn)时间复杂度，因此效率相比第一种实现方法更加高效。
 '''
+
+
+class LittleHeap:
+    '''
+    小顶堆
+    '''
+    def __init__(self, max_len):
+        self.max_len = max_len
+        if max_len <= 0:
+            self.delete = self._no_delete
+            self.add = self._no_add
+        else:
+            self.delete = self._delete
+            self.add = self._add
+        self.data = []
+        return
+
+    def _no_delete(self):
+        return
+
+    def _no_add(self):
+        return
+
+    def _delete(self):
+        return
+
+    def _add(self):
+        return
+
+
+class LFU:
+
+    def __init__(self, max_len=-1):
+        self.heap = LittleHeap(max_len)
+        return
+
+    def get(self, key):
+        return
+
+    def set(self, key, value):
+        return
+
+    def _delete(self):
+        self.heap.delete()
+        return
