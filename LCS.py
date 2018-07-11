@@ -91,17 +91,19 @@ def lcs(first, second):
             else:
                 current_max = max(matrix[i + 1][j], matrix[i][j + 1])
             matrix[i + 1][j + 1] = current_max
-    print max_chars, max_len
+    print(max_chars, max_len)
     for i in matrix:
-        print i
+        print(i)
+    return
 
 
 def main():
     data1 = ['G', 'C', 'T', 'A']
     data2 = ['G', 'B', 'T', 'A']
     lcs(data1, data2)
-    print '-----------'
+    print('-----------')
     lcs(['G', 'C', 'T', 'A'], ['G', 'B', 'T', 'T'])
+
 
 if __name__ == '__main__':
     main()

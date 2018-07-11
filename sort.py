@@ -1,6 +1,3 @@
-# coding=utf-8
-from __future__ import unicode_literals
-from __future__ import absolute_import
 '''
 +--------------+-----------+-----------+----------+------------+--------+--------+
 |              +           +           +          +            +        +        +
@@ -93,22 +90,29 @@ def merge_sort(data):
     return data
 
 
-def adjust_heap(root, data, size):
-    while root < size:
-        child = root * 2 + 1
-        if child >= size:
+def adjust_heap(root_index, data, size):
+    while root_index < size:
+        left_child_index = root_index * 2 + 1
+        right_child_index = left_child_index + 1
+        if left_child_index >= size:
             break
-        if child + 1 < size and data[child] < data[child + 1]:
-            child += 1
-        if data[root] < data[child]:
-            data[root], data[child] = data[child], data[root]
-            root = child
+        max_child_value = data[left_child_index]
+        max_child_index = left_child_index
+        if right_child_index < size and data[right_child_index] > max_child_value:
+            max_child_value = data[right_child_index]
+            max_child_index = right_child_index
+        if data[root_index] < max_child_value:
+            data[root_index], data[max_child_index] = max_child_value, data[root_index]
+            root_index = max_child_index
             continue
         break
 
 
 def heap_sort(data):
     '''
+    http://www.cnblogs.com/skywang12345/p/3602162.html
+    http://bubkoo.com/2014/01/14/sort-algorithm/heap-sort/
+
     最大堆用来做升序的(从小到大)
     最小堆用来做降序的(大到小)
     这是因为第一次构建堆之后，会将最后一个元素和第一个元素进行互换，达到剔除第一个元素， 并且将最后一个元素加到第一个位置， 重新整理堆的效果
@@ -119,11 +123,20 @@ def heap_sort(data):
     http://blog.csdn.net/handsomekang/article/details/41346645
     '''
     size = len(data)
-    root = size / 2 - 1
-    while root >= 0:
-        adjust_heap(root, data, size)
-        root -= 1
+    root_index = int(size / 2 - 1)
+    # 第一步, 建立大根堆, 注意这里是从size/2 - 1开始
+    # 也就是经过第一步之后, 数组就是一个大根堆了, 也就是父节点都比
+    # 其子节点大或等于, 其子节点也是一个大根堆
+    while root_index >= 0:
+        adjust_heap(root_index, data, size)
+        root_index -= 1
     size -= 1
+    # 经过第一步, 也就是建立大根堆之后, 我们得到的顶部元素就是最大值了
+    # 下面是调整为有序数组
+    # 顶部元素和最后一个元素(最后一个元素会变化)交换, 然后顶部元素会沉到合适的位置
+    # 所以下面一步就是通过堆树的维护操作, 使得顶部元素永远是最大值
+    # 那么我们每次都把顶部元素和最后一个元素交换, 这样我们第一次得到最大元素
+    # 第二次我们得到第二大元素, 依以此类推
     while size:
         data[0], data[size] = data[size], data[0]
         adjust_heap(0, data, size)
@@ -135,23 +148,34 @@ def binary_search(data, value):
     二分搜索
     二分搜索和二叉搜索树很类似, 只是二叉查找树不要求有序, 只要求左节点比其父节点小, 右节点比父节点大就好了
     '''
-    if value > data[-1] or data[0] > value:
-        return -1
+    NOT_FOUND = -1
     size = len(data)
+    if size == 0:
+        return NOT_FOUND
+    if value > data[-1] or data[0] > value:
+        return NOT_FOUND
     if value == data[-1]:
         return size - 1
     if value == data[0]:
         return 0
+    if size == 2:
+        return NOT_FOUND
     start, end = 0, size
     while start < end:
-        middle = ((end - start) / 2) + start
+        if end - start == 1:
+            if data[end] == value:
+                return end
+            elif data[start] == value:
+                return start
+            return NOT_FOUND
+        middle = int((end - start) / 2) + start
         if value < data[middle]:
-            end = middle - 1
+            end = middle
         elif value > data[middle]:
-            start = middle + 1
+            start = middle
         else:
             return middle
-    return -1
+    return NOT_FOUND
 
 
 def adjust_middle(data, start, end):
@@ -181,19 +205,59 @@ def quick_sort(data, start, end):
         quick_sort(data, middle + 1, end)
 
 
+def pop_sort(data):
+    '''
+    https://blog.csdn.net/guoweimelon/article/details/50902597
+    优化就是, 如果某一趟没有位置交换, 那么直接break就好了, 证明此时已经排序好了
+    比如一个已经排序好的数组, 第一趟没有位置交换, 那么直接退出, 而一般的冒泡则是继续
+    '''
+    len_data = len(data)
+    tail = len_data - 1
+    while tail >= 1:
+        for index, value in enumerate(data[:tail]):
+            next_index = index + 1
+            next_value = data[next_index]
+            if next_value < value:
+                data[next_index], data[index] = data[index], data[next_index]
+        print(tail, data)
+        tail -= 1
+    return
+
+
 def main():
-    data = [5, 8, 3, 2, 1]
+    data = [3, 6, 4, 2, 11, 10, 5]
+    pop_sort(data)
+    print(data)
+
+    print('--------pop_sort-----------\n')
+
+    data = [3, 6, 4, 2, 11, 10, 5]
     insert_sort(data)
-    print data
+    print(data)
 
-    data = [5, 8, 3, 2, 1]
-    shell_insert_sort(data)
-    print data
+    print('--------insert_sort-----------\n')
 
-    data = [3, 1, 5, 7, 2, 4, 9, 6, 10, 8]
+#     data = [5, 8, 3, 2, 1]
+#     shell_insert_sort(data)
+#     print(data)
+#     print('-------------------')
+
+    data = [20, 30, 90, 40, 70, 110, 60, 10, 100, 50, 80]
     heap_sort(data)
-    print data
-    print binary_search([1, 5], 3)
+    print(data)
+
+    print('-------------heap_sort-------\n')
+
+    tmp = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110]
+    datas = [[tmp, tmp[i]] for i in range(0, len(tmp))]
+    datas.append([[1, 5], 3])
+    datas.append([[], 1])
+    datas.append([list(range(100, 120)), 1])
+    for data, value in datas:
+        print(data, value, binary_search(data, value))
+
+    print('-------------binary_search-------')
+
 
 if __name__ == '__main__':
     main()
